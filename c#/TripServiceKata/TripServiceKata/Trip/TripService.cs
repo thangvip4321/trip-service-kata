@@ -7,11 +7,27 @@ namespace TripServiceKata.Trip
 {
     public class TripService
     {
+        private TripDAO tripDAO;
+        public TripService()
+        {
+            this.tripDAO = new TripDAO();
+        }
+        public TripService(TripDAO tripDAO)
+        {
+            this.tripDAO = tripDAO;
+        }
+
         public List<Trip> GetTripsByUser(User.User user)
         {
-            List<Trip> tripList = new List<Trip>();
             User.User loggedUser = GetLoggedUser();
             ValidateLoggedInUser(loggedUser);
+            bool isFriend = IsFriend(user, loggedUser);
+            var tripList = isFriend ? FindTripByUser(user) : NoTrip();
+            return tripList;
+        }
+
+        private static bool IsFriend(User.User user, User.User loggedUser)
+        {
             bool isFriend = false;
             foreach (User.User friend in user.GetFriends())
             {
@@ -21,13 +37,12 @@ namespace TripServiceKata.Trip
                     break;
                 }
             }
-            if (isFriend)
-            {
-                tripList = FindTripByUser(user);
-            }
-            return tripList;
+            return isFriend;
         }
-
+        private static List<Trip> NoTrip()
+        {
+            return new List<Trip>();
+        }
         private static void ValidateLoggedInUser(User.User loggedUser)
         {
             if (loggedUser == null)
@@ -38,7 +53,7 @@ namespace TripServiceKata.Trip
 
         protected virtual List<Trip> FindTripByUser(User.User user)
         {
-            return TripDAO.FindTripsByUser(user);
+            return tripDAO.FindTripsByUser(user);
         }
 
         protected virtual User.User GetLoggedUser()
