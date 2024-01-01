@@ -11,8 +11,10 @@ namespace TripServiceKata.Tests
     {
 
         private static readonly User.User GUEST = null;
-        private static readonly User.User ANY_USER = new User.User();
-        private static readonly User.User REGISTERED_USER = new User.User();
+        private static readonly User.User ANY_USER = new();
+        private static readonly User.User REGISTERED_USER = new();
+        private static readonly Trip.Trip LONDON = new();
+        private static readonly Trip.Trip BARCELONA = new();
         private TripDAO mockDao;
         private TripService tripService;
         [SetUp]
@@ -37,14 +39,22 @@ namespace TripServiceKata.Tests
         }
 
         [Test]
-        public void TripService_Return_Trip_If_User_Are_Friend()
+        public void TripService_Returns_Two_Trips_If_User_Is_Friend()
         {
+            // Arrange
             var friend = new User.User();
             friend.AddFriend(REGISTERED_USER);
-            friend.AddTrip(new Trip.Trip());
+            friend.AddTrip(LONDON);
+            friend.AddTrip(BARCELONA);
             mockDao.tripsBy(friend).Returns(friend.Trips());
-            var trips = tripService.GetTripsByUser(friend,REGISTERED_USER);
-            Assert.AreEqual(1, trips.Count);
+
+            // Act
+            var trips = tripService.GetTripsByUser(friend, REGISTERED_USER);
+
+            // Assert
+            Assert.AreEqual(2, trips.Count);
+            Assert.IsTrue(trips.Contains(LONDON));
+            Assert.IsTrue(trips.Contains(BARCELONA));
         }
     }
 }
