@@ -52,7 +52,7 @@ namespace TripServiceKata.Trip
 
         protected virtual List<Trip> FindTripByUser(User.User user)
         {
-            return tripDAO.FindTripsByUser(user);
+            return tripDAO.tripsBy(user);
         }
 
         protected virtual User.User GetLoggedUser()
