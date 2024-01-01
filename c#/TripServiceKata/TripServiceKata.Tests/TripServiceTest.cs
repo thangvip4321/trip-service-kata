@@ -11,13 +11,8 @@ namespace TripServiceKata.Tests
     {
         public class TestableTripService : TripService
         {
-            protected override User.User GetLoggedUser()
-            {
-                return loggedInUser;
-            }
             public TestableTripService(TripDAO dao) : base(dao) { }
         }
-        // public User.User LOGGED_IN_USER = new User.User();
         private static readonly User.User GUEST = null;
         private static readonly User.User ANY_USER = new User.User();
         private static readonly User.User REGISTERED_USER = new User.User();
@@ -36,15 +31,15 @@ namespace TripServiceKata.Tests
         public void TripService_WhenUserIsNotLoggedIn_ShouldThrowAnException()
         {
             loggedInUser = GUEST;
-            Assert.Throws<UserNotLoggedInException>(() => tripService.GetTripsByUser(null));
-            Assert.Throws<UserNotLoggedInException>(() => tripService.GetTripsByUser(ANY_USER));
+            Assert.Throws<UserNotLoggedInException>(() => tripService.GetTripsByUser(ANY_USER,GUEST));
+            Assert.Throws<UserNotLoggedInException>(() => tripService.GetTripsByUser(null,GUEST));
         }
         [Test]
         public void TripService_Return_No_Trip_If_User_Are_Not_Friend()
         {
             var stranger = new User.User();
             stranger.AddTrip(new Trip.Trip());
-            var trips = tripService.GetTripsByUser(stranger);
+            var trips = tripService.GetTripsByUser(stranger,REGISTERED_USER);
             Assert.IsEmpty(trips);
         }
 
@@ -52,10 +47,10 @@ namespace TripServiceKata.Tests
         public void TripService_Return_Trip_If_User_Are_Friend()
         {
             var friend = new User.User();
-            friend.AddFriend(loggedInUser);
+            friend.AddFriend(REGISTERED_USER);
             friend.AddTrip(new Trip.Trip());
             mockDao.FindTripsByUser(friend).Returns(friend.Trips());
-            var trips = tripService.GetTripsByUser(friend);
+            var trips = tripService.GetTripsByUser(friend,REGISTERED_USER);
             Assert.AreEqual(1, trips.Count);
         }
     }

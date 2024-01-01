@@ -17,11 +17,10 @@ namespace TripServiceKata.Trip
             this.tripDAO = tripDAO;
         }
 
-        public List<Trip> GetTripsByUser(User.User user)
+        public List<Trip> GetTripsByUser(User.User user,User.User loggedInUser)
         {
-            User.User loggedUser = GetLoggedUser();
-            ValidateLoggedInUser(loggedUser);
-            bool isFriend = IsFriend(user, loggedUser);
+            ValidateLoggedInUser(loggedInUser);
+            bool isFriend = IsFriend(user, loggedInUser);
             var tripList = isFriend ? FindTripByUser(user) : NoTrip();
             return tripList;
         }
